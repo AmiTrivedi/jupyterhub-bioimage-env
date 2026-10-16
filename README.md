@@ -4,19 +4,18 @@ A **JupyterHub-based Docker image** with a pre-configured **Python environment**
 
 - [CellProfiler](https://cellprofiler.org/)
 - [Cellpose](https://www.cellpose.org/)
-- [Fiji](https://fiji.sc/)
-- [Ilastik](https://www.ilastik.org/)
 - [QuPath](https://qupath.github.io/)
+- [SAMAPI](https://github.com/ksugar/samapi)
 
 ---
 
 ## 📦 Overview
 
-This repository outlines the Docker image configuration and Jupyter proxy integration used to support image analysis tools.
+This repository outlines two separate docker images ( image-cellprofiler and image-qupath )  configuration and Jupyter proxy integration used to support image analysis tools.
 
-Currently, the image is based on the **University of Münster JupyterHub image**. However, we are planning to build a separate, standalone image to ensure accessibility and compatibility with various JupyterHub instances.
+The base image we used here is based on the **University of Münster JupyterHub.nrw** [instace] (https://www.jupyterhub.nrw/de/). However, we are planning to build a separate, standalone base image to ensure accessibility and compatibility with various JupyterHub instances.
 
-To build the image yourself, you can start with either:
+To build the image yourself, you can start with either
 
 - A standard Linux base image (e.g., `ubuntu`, `debian`)
 - A JupyterHub notebook base image (e.g., from [Jupyter Docker Stacks](https://jupyter-docker-stacks.readthedocs.io/en/latest/))
@@ -35,11 +34,10 @@ This setup enables support for **GUI-based applications** within the Jupyter not
 
 | No. | Tool         | Version     | Plugins                                                                 |
 |-----|--------------|-------------|-------------------------------------------------------------------------|
-| 1   | CellProfiler | v4.2.7      | cellpose, imagejscript, omnipose                                                                      |
-| 2   | Cellpose     | v2.0.5      | –                                                                       |
-| 3   | Fiji         | 2.14.0      | OMERO-Fiji (v5.8.6), MorphoLibJ, simple-omero-client, omero-macro-extension |
-| 4   | Ilastik      | v1.4.0      | –                                                                       |
-| 5   | QuPath       | v0.5.1      | Cellpose (0.9.6), StarDist, OMERO extension                             |
+| 1   | CellProfiler | v4.2.8      | cellpose, stardist, omnipose                                        |
+| 2   | Cellpose     | v3.1.1.2    | –                                                                       |
+| 3   | QuPath       | v0.7.0      | Cellpose (0.10.2), StarDist, OMERO extension                            |
+| 4   | SAMAPI server| v0.7.1      |                                                                         |
 
 ---
 
@@ -51,11 +49,6 @@ This setup enables support for **GUI-based applications** within the Jupyter not
 
 ---
 
-## 📄 License
-
-This project is released under the MIT License. See the [LICENSE](./LICENSE) file for details.
-
----
 
 
 
