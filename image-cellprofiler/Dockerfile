@@ -25,13 +25,13 @@ RUN apt-get update && apt-get upgrade -y && \
 # Set PATH and ENV
 # -----------------------------------------------------------
 
-
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 
 ENV PATH=/opt/conda/bin:$PATH
 ENV PATH=/usr/local/cuda/bin:$PATH
 
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/lib/x86_64-linux-gnu:/usr/lib64:$LD_LIBRARY_PATH
+
 # --------------------------------------------------------------
 # CellProfiler Environment Python 3.9
 # --------------------------------------------------------------
@@ -40,12 +40,12 @@ RUN conda create -n cellprofiler python=3.9 -y && \
     conda config --add channels conda-forge 
 
 # Install Python dependencies 
-RUN /bin/bash -c "source activate cellprofiler && \
-    pip install numpy centrosome cellpose[GUI]==3.1.1.2 ezomero bia-bob stackview pyclesperanto && \
-    python -m pip install --upgrade pip wheel && \
-    pip install jpype1==1.4.1 && \
-    python -m pip install setuptools==69.0.0 && \
-    conda install -c conda-forge wxpython=4.2.* python-javabridge typing_extensions mysqlclient mysql jupyterlab_widgets ipywidgets"
+
+RUN conda run -n cellprofiler pip install numpy centrosome "cellpose[GUI]==3.1.1.2" ezomero bia-bob stackview pyclesperanto && \
+    conda run -n cellprofiler python -m pip install --upgrade pip wheel && \
+    conda run -n cellprofiler pip install jpype1==1.4.1 && \
+    conda run -n cellprofiler python -m pip install setuptools==69.0.0 && \
+    conda install -n cellprofiler -c conda-forge wxpython=4.2.* python-javabridge typing_extensions mysqlclient mysql jupyterlab_widgets ipywidgets
 
 
   
@@ -53,14 +53,13 @@ RUN /bin/bash -c "source activate cellprofiler && \
 WORKDIR /opt
 RUN git clone --branch v4.2.8 https://github.com/CellProfiler/CellProfiler.git
 WORKDIR /opt/CellProfiler
-RUN /bin/bash -c "source activate cellprofiler  && pip install . --no-build-isolation"
+RUN conda run -n cellprofiler pip install . --no-build-isolation
 
 
 WORKDIR /opt
 RUN git clone https://github.com/CellProfiler/CellProfiler-plugins.git
 WORKDIR /opt/CellProfiler-plugins
-RUN /bin/bash -c "source activate cellprofiler && \
-              pip install -e .[cellpose,stardist,omnipose]"
+RUN conda run -n cellprofiler pip install -e ".[cellpose,stardist,omnipose]"
 
 # remove some plugins 
 RUN rm -f \
@@ -69,14 +68,18 @@ RUN rm -f \
     /opt/CellProfiler-plugins/active_plugins/runimagejscript.py \
     /opt/CellProfiler-plugins/unmaintained_plugins/CellProfiler3/runimagej.py \
     /opt/CellProfiler-plugins/unmaintained_plugins/CellProfiler4_autoconverted/runimagej.py
+
 # Patches 
 COPY ./config/patch_runcellpose.py /tmp/patch_runcellpose.py
-RUN /bin/bash -c "source activate cellprofiler && python /tmp/patch_runcellpose.py"
+RUN conda run -n cellprofiler python /tmp/patch_runcellpose.py
 
 # Download CellPose models 
 COPY ./config/download_cellpose_models.py /
-RUN /bin/bash -c "source activate cellprofiler && python /download_cellpose_models.py"
-RUN /bin/bash -c "conda run -n cellprofiler conda install -y ipykernel && conda run -n cellprofiler python -m ipykernel install --name cellprofiler --display-name 'Python Cellprofiler'"
+RUN conda run -n cellprofiler python /download_cellpose_models.py
+RUN conda install -n cellprofiler -y ipykernel && \
+    conda run -n cellprofiler python -m ipykernel install \
+    --name cellprofiler \
+    --display-name "Python CellProfiler_v4"
 
 COPY ./config/CellProfilerLocal.cfg /tmp/
 
@@ -93,7 +96,7 @@ RUN pip install --no-cache-dir \
    
    
 WORKDIR /usr/local/src
-#USER nobody
+USER ${NB_UID}
 
 
 

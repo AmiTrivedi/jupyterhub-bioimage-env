@@ -32,14 +32,12 @@ RUN LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64:$LD_LIBRARY_PATH
 
 
 
-
 # -----------------------------------------------------------
 # Cellpose GUI  version 3.1.1.2
 # -----------------------------------------------------------
 
 RUN conda create -n cellpose python=3.10 -y
-RUN /bin/bash -c "source activate cellpose && \
-    pip install cellpose[gui]==3.1.1.2"
+RUN conda run -n cellpose pip install "cellpose[gui]==3.1.1.2"
 
 # -----------------------------------------------------------
 # QuPATH version 0.7.0
@@ -73,10 +71,10 @@ RUN wget https://github.com/BIOP/qupath-extension-cellpose/releases/download/v0.
 
 WORKDIR /opt/QuPath/lib/app/extensions
 RUN wget https://github.com/ksugar/qupath-extension-sam/releases/download/v0.9.1/qupath-extension-sam-0.9.1-all.jar
-RUN /bin/bash -c "python -m pip install git+https://github.com/ksugar/samapi.git@v0.7.1"
+RUN python -m pip install git+https://github.com/ksugar/samapi.git@v0.7.1
 
 RUN conda install -n cellpose -y ipykernel && \
-    conda run -n cellpose python -m ipykernel install --name cellpose --display-name "Python Cellpose"
+    conda run -n cellpose python -m ipykernel install --name cellpose --display-name "Python Cellpose_v3"
 
 
 COPY ./config/script.groovy /opt  
@@ -99,7 +97,7 @@ RUN pip install --no-cache-dir \
    
 
 WORKDIR /usr/local/src
-#USER nobody
+USER ${NB_UID}
 
 
 
